@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Collapse,
@@ -13,7 +13,7 @@ import {
     ThemeProvider,
     Typography
 } from '@mui/material';
-import {ErrorOutline, ExpandLess, ExpandMore, WarningAmber} from '@mui/icons-material';
+import { ErrorOutline, ExpandLess, ExpandMore, WarningAmber } from '@mui/icons-material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const darkTheme = createTheme({
@@ -22,7 +22,21 @@ const darkTheme = createTheme({
     },
 });
 
-export default function NestedList({input_object, hasFlag}) {
+// Add custom CSS styles for the scroll bar
+const styles = `
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+  }
+`;
+
+export default function NestedList({ input_object, hasFlag }) {
     const [openStates, setOpenStates] = useState({});
     const [searchKey, setSearchKey] = useState('');
     const [filteredKeys, setFilteredKeys] = useState([]);
@@ -55,11 +69,11 @@ export default function NestedList({input_object, hasFlag}) {
         if (!hasFlag) {
             const listLength = input_object[key].length;
             if (listLength > 2) {
-                return <ErrorOutline color="error"/>;
+                return <ErrorOutline color="error" />;
             } else if (listLength === 2) {
-                return <WarningAmber color="warning"/>;
+                return <WarningAmber color="warning" />;
             } else {
-                return <CheckCircleOutlineIcon color="success"/>;
+                return <CheckCircleOutlineIcon color="success" />;
             }
         }
 
@@ -69,19 +83,20 @@ export default function NestedList({input_object, hasFlag}) {
         }
 
         if (maxv === 2) {
-            return <ErrorOutline color="error"/>;
+            return <ErrorOutline color="error" />;
         } else if (maxv === 1) {
-            return <WarningAmber color="warning"/>;
+            return <WarningAmber color="warning" />;
         } else {
-            return <CheckCircleOutlineIcon color="success"/>;
+            return <CheckCircleOutlineIcon color="success" />;
         }
     };
 
     return (
         <ThemeProvider theme={darkTheme}>
             <Box display="flex" flexDirection="column" height="100vh">
+                <style>{styles}</style> {/* Apply custom styles to the scroll bar */}
                 <TextField
-                    sx={{width: '100%', marginTop: '10px', marginBottom: '10px'}}
+                    sx={{ width: '100%', marginTop: '10px', marginBottom: '10px'}}
                     label="Поиск"
                     color="secondary"
                     value={searchKey}
@@ -90,12 +105,14 @@ export default function NestedList({input_object, hasFlag}) {
 
                 <List
                     sx={{
+                        width: '100%',
                         flex: 1,
                         position: 'relative',
-                        overflow: 'auto'
+                        overflow: 'auto',
+                        maxHeight: 'calc(100vh - 200px)', // Adjust the value to fit your layout
                     }}
                     component="nav"
-                    subheader={<ListSubheader component="div" id="nested-list-subheader"/>}
+                    subheader={<ListSubheader component="div" id="nested-list-subheader" />}
                 >
                     {filteredKeys.length === 0 ? (
                         <Typography variant="body2" color="text.secondary" textAlign="center" mt={4}>
@@ -108,8 +125,8 @@ export default function NestedList({input_object, hasFlag}) {
                                     <ListItemIcon>
                                         {getIcon(key)}
                                     </ListItemIcon>
-                                    <ListItemText primary={key}/>
-                                    {openStates[key] ? <ExpandLess/> : <ExpandMore/>}
+                                    <ListItemText primary={key} />
+                                    {openStates[key] ? <ExpandLess /> : <ExpandMore />}
                                 </ListItemButton>
                                 <Collapse in={openStates[key]} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
@@ -119,18 +136,18 @@ export default function NestedList({input_object, hasFlag}) {
                                                     <ListItem key={`${key}-${idx}`}>
                                                         <ListItemIcon>
                                                             {input_object[key][test] === 2 ? (
-                                                                <ErrorOutline color="error"/>
+                                                                <ErrorOutline color="error" />
                                                             ) : (
-                                                                <WarningAmber color="warning"/>
+                                                                <WarningAmber color="warning" />
                                                             )}
                                                         </ListItemIcon>
-                                                        <ListItemText primary={test}/>
+                                                        <ListItemText primary={test} />
                                                     </ListItem>
                                                 ))
                                             ) : (
                                                 input_object[key].map((item, idx) => (
                                                     <ListItem key={`${key}-${idx}`}>
-                                                        <ListItemText primary={item}/>
+                                                        <ListItemText primary={item} />
                                                     </ListItem>
                                                 ))
                                             )}
