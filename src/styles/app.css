@@ -7,7 +7,27 @@
     height: 100%;
     background: linear-gradient(45deg, #4d1a15, #4d0c2e, #0e3a47, #0e4f36);
     background-size: 600% 600%;
-    animation: gradientAnimation 10s ease infinite;
+    opacity: 0;
+    animation: fadeAnimation 0.5s ease forwards, gradientAnimation 10s ease infinite;
+    transition: background 0.5s ease; /* Add a transition property for the background */
+}
+
+@keyframes fadeAnimation {
+    0% {
+        opacity: 0; /* Начальное значение opacity */
+    }
+    25% {
+        opacity: 0.25; /* Значение opacity на четверти анимации */
+    }
+    50% {
+        opacity: 0.5; /* Значение opacity на половине анимации */
+    }
+    75% {
+        opacity: 0.75; /* Значение opacity на трехчетверти анимации */
+    }
+    100% {
+        opacity: 1; /* Конечное значение opacity */
+    }
 }
 
 @keyframes gradientAnimation {

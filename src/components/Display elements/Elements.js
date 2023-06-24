@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Box,
     Collapse,
@@ -9,11 +9,12 @@ import {
     ListItemIcon,
     ListItemText,
     ListSubheader,
+    MenuItem,
     TextField,
     ThemeProvider,
-    Typography
+    Typography,
 } from '@mui/material';
-import { ErrorOutline, ExpandLess, ExpandMore, WarningAmber } from '@mui/icons-material';
+import {ErrorOutline, ExpandLess, ExpandMore, WarningAmber,} from '@mui/icons-material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const darkTheme = createTheme({
@@ -36,15 +37,16 @@ const styles = `
   }
 `;
 
-export default function NestedList({ input_object, hasFlag }) {
+export default function NestedList({input_object, hasFlag}) {
     const [openStates, setOpenStates] = useState({});
     const [searchKey, setSearchKey] = useState('');
     const [filteredKeys, setFilteredKeys] = useState([]);
+    const [filterOption, setFilterOption] = useState('all'); // 'all', 'error', 'warning'
 
     const handleClick = (id) => {
         setOpenStates((prevOpenStates) => ({
             ...prevOpenStates,
-            [id]: !prevOpenStates[id]
+            [id]: !prevOpenStates[id],
         }));
     };
 
@@ -69,39 +71,88 @@ export default function NestedList({ input_object, hasFlag }) {
         if (!hasFlag) {
             const listLength = input_object[key].length;
             if (listLength > 2) {
-                return <ErrorOutline color="error" />;
+                return <ErrorOutline color="error"/>;
             } else if (listLength === 2) {
-                return <WarningAmber color="warning" />;
+                return <WarningAmber color="warning"/>;
             } else {
-                return <CheckCircleOutlineIcon color="success" />;
+                return <CheckCircleOutlineIcon color="success"/>;
             }
         }
 
-        let maxv = 0;
+        let max_value = 0;
         for (const test in input_object[key]) {
-            maxv = Math.max(maxv, input_object[key][test]);
+            max_value = Math.max(max_value, input_object[key][test]);
         }
 
-        if (maxv === 2) {
-            return <ErrorOutline color="error" />;
-        } else if (maxv === 1) {
-            return <WarningAmber color="warning" />;
+        if (max_value === 2) {
+            return <ErrorOutline color="error"/>;
+        } else if (max_value === 1) {
+            return <WarningAmber color="warning"/>;
         } else {
-            return <CheckCircleOutlineIcon color="success" />;
+            return <CheckCircleOutlineIcon color="success"/>;
         }
     };
+
+    const handleFilterChange = (event) => {
+        setFilterOption(event.target.value);
+    };
+
+    const filterItems = (items) => {
+        if (filterOption === 'all') {
+            return items;
+        } else if (filterOption === 'error') {
+            return items.filter((item) => {
+                if (hasFlag) {
+                    return Object.values(input_object[item]).some((value) => value === 2);
+                } else {
+                    return input_object[item].length > 2;
+                }
+            });
+        } else if (filterOption === 'warning') {
+            return items.filter((item) => {
+                if (hasFlag) {
+                    return Object.values(input_object[item]).every((value) => value === 1);
+                } else {
+                    return input_object[item].length === 2;
+                }
+            });
+        } else {
+            return items;
+        }
+    };
+
 
     return (
         <ThemeProvider theme={darkTheme}>
             <Box display="flex" flexDirection="column" height="100vh">
-                <style>{styles}</style> {/* Apply custom styles to the scroll bar */}
-                <TextField
-                    sx={{ width: '100%', marginTop: '10px', marginBottom: '10px'}}
-                    label="Поиск"
-                    color="secondary"
-                    value={searchKey}
-                    onChange={(e) => setSearchKey(e.target.value)}
-                />
+                <style>{styles}</style>
+                <Box sx={{
+                    marginTop: '10px',
+                    marginBottom: '10px',
+                    justifyContent: 'center',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}>
+                    <TextField
+                        sx={{width: '50%', marginRight: '10px'}}
+                        label="Поиск"
+                        color="secondary"
+                        value={searchKey}
+                        onChange={(e) => setSearchKey(e.target.value)}
+                    />
+                    <TextField
+                        select
+                        sx={{width: '50%'}}
+                        label="Фильтр"
+                        color="secondary"
+                        value={filterOption}
+                        onChange={handleFilterChange}
+                    >
+                        <MenuItem value="all">Все</MenuItem>
+                        <MenuItem value="warning">Подозреваемые</MenuItem>
+                        <MenuItem value="error">Злоумышленники</MenuItem>
+                    </TextField>
+                </Box>
 
                 <List
                     sx={{
@@ -109,24 +160,22 @@ export default function NestedList({ input_object, hasFlag }) {
                         flex: 1,
                         position: 'relative',
                         overflow: 'auto',
-                        maxHeight: 'calc(100vh - 200px)', // Adjust the value to fit your layout
+                        maxHeight: 'calc(100vh - 200px)',
                     }}
                     component="nav"
-                    subheader={<ListSubheader component="div" id="nested-list-subheader" />}
+                    subheader={<ListSubheader component="div" id="nested-list-subheader"/>}
                 >
                     {filteredKeys.length === 0 ? (
                         <Typography variant="body2" color="text.secondary" textAlign="center" mt={4}>
                             Результатов не найдено
                         </Typography>
                     ) : (
-                        filteredKeys.map((key) => (
+                        filterItems(filteredKeys).map((key) => (
                             <React.Fragment key={key}>
                                 <ListItemButton onClick={() => handleClick(key)}>
-                                    <ListItemIcon>
-                                        {getIcon(key)}
-                                    </ListItemIcon>
-                                    <ListItemText primary={key} />
-                                    {openStates[key] ? <ExpandLess /> : <ExpandMore />}
+                                    <ListItemIcon>{getIcon(key)}</ListItemIcon>
+                                    <ListItemText primary={key}/>
+                                    {openStates[key] ? <ExpandLess/> : <ExpandMore/>}
                                 </ListItemButton>
                                 <Collapse in={openStates[key]} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
@@ -136,18 +185,18 @@ export default function NestedList({ input_object, hasFlag }) {
                                                     <ListItem key={`${key}-${idx}`}>
                                                         <ListItemIcon>
                                                             {input_object[key][test] === 2 ? (
-                                                                <ErrorOutline color="error" />
+                                                                <ErrorOutline color="error"/>
                                                             ) : (
-                                                                <WarningAmber color="warning" />
+                                                                <WarningAmber color="warning"/>
                                                             )}
                                                         </ListItemIcon>
-                                                        <ListItemText primary={test} />
+                                                        <ListItemText primary={test}/>
                                                     </ListItem>
                                                 ))
                                             ) : (
                                                 input_object[key].map((item, idx) => (
                                                     <ListItem key={`${key}-${idx}`}>
-                                                        <ListItemText primary={item} />
+                                                        <ListItemText primary={item}/>
                                                     </ListItem>
                                                 ))
                                             )}

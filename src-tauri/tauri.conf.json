@@ -6,7 +6,7 @@
     "distDir": "../build"
   },
   "package": {
-    "productName": "fing-pig",
+    "productName": "AbuserFinder",
     "version": "0.1.0"
   },
   "tauri": {
@@ -31,7 +31,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "egor.ermakov.pp",
+      "identifier": "egor.ermakov.af",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

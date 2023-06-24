@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use calamine::{open_workbook, Reader, Xlsx};
 use chrono::NaiveDateTime;
+use regex::Regex;
 
 use crate::DATA;
 
@@ -12,12 +13,29 @@ use crate::DATA;
  2 - ВИНОВЕН!
  */
 
+fn match_ip(ip: &str) -> bool {
+    let ip_pattern = Regex::new(r"^(\d{1,3}\.){3}\d{1,3}$").unwrap();
+    ip_pattern.is_match(ip)
+}
+
+fn match_date(ip: &str) -> bool {
+    let ip_pattern = Regex::new(r"^(\d{1,3}\.){3}\d{1,3}$").unwrap();
+    ip_pattern.is_match(ip)
+}
+
 #[tauri::command]
 pub async fn get_rows(path: &str) -> Result<(), ()> {
+    unsafe { DATA.clear(); }
     let mut excel: Xlsx<_> = open_workbook(path).unwrap();
     let sheets = &excel.sheet_names().to_vec()[0];
     if let Some(Ok(r)) = excel.worksheet_range(sheets) {
         for row in r.rows().skip(1) {
+            if row.len() != 9 {
+                continue;
+            }
+            if !row[4].is_string() || !row[8].is_string() || !row[5].is_string() {
+                continue;
+            }
             if row[4].to_string() != "Тест" || row[8].to_string().is_empty() {
                 continue;
             }

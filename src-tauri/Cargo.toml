@@ -15,6 +15,7 @@ rust-version = "1.60"
 tauri-build = { version = "1.4.0", features = [] }
 
 [dependencies]
+regex = "1"
 calamine = "0.21.1"
 chrono = "0.4.26"
 serde_json = "1.0"
