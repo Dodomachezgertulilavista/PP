@@ -5,7 +5,7 @@ import Header from "./components/Layouts/Header";
 import Footer from "./components/Layouts/Footer";
 import {State} from "./components/state";
 import {LinearProgress, Typography} from "@mui/material";
-import './styles/app.css'; // Import custom CSS file
+import './styles/app.css';
 
 const darkTheme = createTheme({
     palette: {
