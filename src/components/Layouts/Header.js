@@ -1,19 +1,17 @@
 import React from 'react';
 import {AppBar, Toolbar, Typography} from "@mui/material";
-import ButFile from '../Display elements/ButFile'
+import ButFile from '../Display elements/ButFile';
+import '../../styles/appbar.css'; // Import CSS file for custom styles
 
-
-export default function () {
-    return (
-        <div>
-            <AppBar position="static" /*sx={{height: 200}}*/>
-                <Toolbar sx={{justifyContent: 'space-between'}}>
-                    <Typography variant="h6">
-                        Поиск злоумышленников
-                    </Typography>
-                    <ButFile/>
-                </Toolbar>
-            </AppBar>
-        </div>
-    )
+export default function App({egg, setEgg, state, setLoading}) {
+    return (<div>
+        <AppBar position="static">
+            <Toolbar sx={{justifyContent: 'space-between'}}>
+                <Typography onClick={() => setEgg(!egg)} variant="h6" className="animated-gradient">
+                    Поиск злоумышленников
+                </Typography>
+                <ButFile state={state} setter={setLoading}/>
+            </Toolbar>
+        </AppBar>
+    </div>);
 }
